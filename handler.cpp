@@ -133,6 +133,7 @@ void NotesHandler::RequestAllNotes(const Http::Request& request,
 {
     stringstream allnotes; 
     string query = request.query().get("query").getOrElse("");
+    int i = 0;
 
     allnotes << "[" << endl;
 
@@ -143,6 +144,9 @@ void NotesHandler::RequestAllNotes(const Http::Request& request,
         // verify the note matches the search query if present
         if(body.find(query) == string::npos)
           continue;
+
+        if(i > 0)
+          allnotes << ", " << endl;
 
         // build a JSON doc with the retrieved content
         Document doc;
@@ -162,10 +166,11 @@ void NotesHandler::RequestAllNotes(const Http::Request& request,
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
         doc.Accept(writer);
-        allnotes << buffer.GetString() << endl;
+        allnotes << buffer.GetString();
+        i++;
     }
 
-    allnotes << "]";
+    allnotes << endl << "]" << endl;
     response.send(Http::Code::Ok, allnotes.str());
 }
 
